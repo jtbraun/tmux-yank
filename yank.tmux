@@ -33,20 +33,24 @@ error_handling_if_command_not_present() {
 set_copy_mode_bindings() {
 	local copy_command="$1"
 	local copy_wo_newline_command="$(clipboard_copy_without_newline_command "$copy_command")"
-	tmux bind-key -t vi-copy "$(yank_key)"     copy-pipe "$copy_command"
+	#tmux bind-key -t vi-copy "$(yank_key)"     copy-pipe "$copy_command"
+	tmux bind-key -t vi-copy MouseDragEnd1Pane copy-pipe "$copy_command"
 	tmux bind-key -t vi-copy "$(put_key)"      copy-pipe "tmux paste-buffer"
 	tmux bind-key -t vi-copy "$(yank_put_key)" copy-pipe "$copy_command; tmux paste-buffer"
 	tmux bind-key -t vi-copy "$(yank_wo_newline_key)" copy-pipe "$copy_wo_newline_command"
 
-	tmux bind-key -t emacs-copy "$(yank_key)"     copy-pipe "$copy_command"
+	#tmux bind-key -t emacs-copy "$(yank_key)"     copy-pipe "$copy_command"
+	tmux bind-key -t emacs-copy MouseDragEnd1Pane copy-pipe "$copy_command"
 	tmux bind-key -t emacs-copy "$(put_key)"      copy-pipe "tmux paste-buffer"
 	tmux bind-key -t emacs-copy "$(yank_put_key)" copy-pipe "$copy_command; tmux paste-buffer"
 	tmux bind-key -t emacs-copy "$(yank_wo_newline_key)" copy-pipe "$copy_wo_newline_command"
+
+	tmux bind-key -T root MouseDown2Pane run-shell "$SCRIPTS_DIR/paste_pane.sh"
 }
 
 set_normal_bindings() {
-	tmux bind-key "$(yank_line_key)" run-shell -b "$SCRIPTS_DIR/copy_line.sh"
-	tmux bind-key "$(yank_pane_pwd_key)" run-shell -b "$SCRIPTS_DIR/copy_pane_pwd.sh"
+	tmux bind-key "$(yank_line_key)" run-shell "$SCRIPTS_DIR/copy_line.sh"
+	tmux bind-key "$(yank_pane_pwd_key)" run-shell "$SCRIPTS_DIR/copy_pane_pwd.sh"
 }
 
 main() {
