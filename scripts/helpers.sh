@@ -78,6 +78,10 @@ paste_selection() {
 	echo "$(get_tmux_option "$paste_selection_option" "$paste_selection_default")"
 }
 
+paste_selection() {
+	echo "$(get_tmux_option "$paste_selection_option" "$paste_selection_default")"
+}
+
 shell_mode() {
     get_tmux_option "$shell_mode_option" "$shell_mode_default"
 }
@@ -175,6 +179,27 @@ tmux_is_at_least() {
         fi
     done
     return 0
+}
+
+clipboard_paste_command() {
+	# installing reattach-to-user-namespace is recommended on OS X
+	if command_exists "pbpaste"; then
+		if command_exists "reattach-to-user-namespace"; then
+			echo "reattach-to-user-namespace pbcopy"
+		else
+			echo "pbpaste"
+		fi
+	elif command_exists "xclip"; then
+		local xclip_selection="$(past_selection)"
+		echo "xclip -o -selection $xclip_selection"
+	elif command_exists "xsel"; then
+		local xsel_selection="$(paste_selection)"
+		echo "xsel -o --$xsel_selection"
+	elif command_exists "getclip"; then # cygwin clipboard command
+		echo "getclip"
+	elif [ -n "$(custom_paste_command)" ]; then
+		echo "$(custom_paste_command)"
+	fi
 }
 
 clipboard_paste_command() {
