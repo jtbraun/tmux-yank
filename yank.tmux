@@ -15,8 +15,8 @@ set_error_bindings() {
 	local key_bindings="$(yank_key) $(put_key) $(yank_put_key)"
 	local key
 	for key in $key_bindings; do
-		tmux bind-key -t vi-copy    "$key" copy-pipe "tmux display-message 'Error! tmux-yank dependencies not installed!'"
-		tmux bind-key -t emacs-copy "$key" copy-pipe "tmux display-message 'Error! tmux-yank dependencies not installed!'"
+		tmux bind-key -T copy-mode-vi "$key" send-keys -X copy-pipe "tmux display-message 'Error! tmux-yank dependencies not installed!'"
+		tmux bind-key -T copy-mode    "$key" send-keys -X copy-pipe "tmux display-message 'Error! tmux-yank dependencies not installed!'"
 	done
 }
 
@@ -34,16 +34,16 @@ set_copy_mode_bindings() {
 	local copy_command="$1"
 	local copy_wo_newline_command="$(clipboard_copy_without_newline_command "$copy_command")"
 	#tmux bind-key -t vi-copy "$(yank_key)"     copy-pipe "$copy_command"
-	tmux bind-key -t vi-copy MouseDragEnd1Pane copy-pipe "$copy_command"
-	tmux bind-key -t vi-copy "$(put_key)"      copy-pipe "tmux paste-buffer"
-	tmux bind-key -t vi-copy "$(yank_put_key)" copy-pipe "$copy_command; tmux paste-buffer"
-	tmux bind-key -t vi-copy "$(yank_wo_newline_key)" copy-pipe "$copy_wo_newline_command"
+	tmux bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "$copy_command"
+	tmux bind-key -T copy-mode-vi "$(put_key)"      send-keys -X copy-pipe "tmux paste-buffer"
+	tmux bind-key -T copy-mode-vi "$(yank_put_key)" send-keys -X copy-pipe "$copy_command; tmux paste-buffer"
+	tmux bind-key -T copy-mode-vi "$(yank_wo_newline_key)" send-keys -X copy-pipe "$copy_wo_newline_command"
 
 	#tmux bind-key -t emacs-copy "$(yank_key)"     copy-pipe "$copy_command"
-	tmux bind-key -t emacs-copy MouseDragEnd1Pane copy-pipe "$copy_command"
-	tmux bind-key -t emacs-copy "$(put_key)"      copy-pipe "tmux paste-buffer"
-	tmux bind-key -t emacs-copy "$(yank_put_key)" copy-pipe "$copy_command; tmux paste-buffer"
-	tmux bind-key -t emacs-copy "$(yank_wo_newline_key)" copy-pipe "$copy_wo_newline_command"
+	tmux bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "$copy_command"
+	tmux bind-key -T copy-mode "$(put_key)"      send-keys -X copy-pipe "tmux paste-buffer"
+	tmux bind-key -T copy-mode "$(yank_put_key)" send-keys -X copy-pipe "$copy_command; tmux paste-buffer"
+	tmux bind-key -T copy-mode "$(yank_wo_newline_key)" send-keys -X copy-pipe "$copy_wo_newline_command"
 
 	tmux bind-key -T root MouseDown2Pane run-shell "$SCRIPTS_DIR/paste_pane.sh"
 }
